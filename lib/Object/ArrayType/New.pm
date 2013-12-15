@@ -57,6 +57,7 @@ sub _validate_and_install {
   my @install;
   PARAM: while (my ($initarg, $def) = splice @items, 0, 2) {
     my $store = $def ? $def : uc($initarg);
+    # FIXME sanity check $store
     push @install, +{
       name     => $initarg,
       constant => $store,
@@ -124,10 +125,7 @@ Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
   package MyObject;
   use strict; use warnings;
   use Object::ArrayType::New
-    [
-      foo => 'FOO',
-      bar => 'BAR'
-    ];
+    [ foo => 'FOO', bar => 'BAR' ];
   sub foo { shift->[FOO] }
   sub bar { shift->[BAR] }
 
@@ -159,9 +157,12 @@ A common thing I find myself doing looks something like:
 ... when I'd rather be doing something more like the L</SYNOPSIS>.
 
 This tiny module takes a list of pairs mapping a C<new()> parameter to the name of
-a constant representing the parameter's position in the backing ARRAY. An
-appropriate constructor is generated and installed, as well as constants that
-can be used within the class to index into the C<$self> object.
+a constant representing the parameter's position in the backing ARRAY. If the
+constant's name is boolean false, the uppercased parameter name is taken as
+the name of the constant.
+
+An appropriate constructor is generated and installed, as well as constants
+that can be used within the class to index into the C<$self> object.
 
 That's it; no accessors, no defaults, no type-checks, no required attributes,
 nothing fancy (L<Class::Method::Modifiers> may be convenient there).
