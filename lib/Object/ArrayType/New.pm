@@ -72,7 +72,7 @@ sub _validate_and_install {
 sub _generate_storage {
   my ($class, $target, $items) = @_;
   my $idx = 0;
-  my $code = qq[  bless \$self, \$class;\n  my \@def;\n];
+  my $code = '';
   for my $item (@$items) {
     my $attr = $item->{name};
     $code .= qq[  \$self->[$idx] = defined \$args->{$attr} ?\n];
@@ -99,7 +99,7 @@ sub new {
     $args = +{ @_ }
   }
 
-  my $self = [];
+  my $self = []; bless $self, $class;
 
 _EOC
   
@@ -109,7 +109,70 @@ _EOC
   $class->_inject_code($target => $code)  
 }
 
-
 1;
+
+=pod
+
+=for Pod::Coverage import
+
+=head1 NAME
+
+Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
+
+=head1 SYNOPSIS
+
+  package MyObject;
+  use strict; use warnings;
+  use Object::ArrayType::New
+    [
+      foo => 'FOO',
+      bar => 'BAR'
+    ];
+  sub foo { shift->[FOO] }
+  sub bar { shift->[BAR] }
+
+  my $obj = MyObject->new(foo => 'baz');
+  my $foo = $obj->foo; # baz
+  my $bar = $obj->bar; # undef
+
+=head1 DESCRIPTION
+
+A common thing I find myself doing looks something like:
+
+  package MySimpleObject;
+  use strict; use warnings;
+
+  sub TAG () { 0 }
+  sub BUF () { 1 }
+
+  sub new {
+    my $class = shift;
+    my %params = @_ > 1 ? @_ : %{ $_[0] };
+    bless [
+      $params{tag},             # TAG
+      ($params{buffer} || [])   # BUF
+    ], $class
+  }
+  sub tag     { shift->[TAG] }
+  sub buffer  { shift->[BUF] }
+
+... when I'd rather be doing something more like the L</SYNOPSIS>.
+
+This tiny module takes a list of pairs mapping a C<new()> parameter to the name of
+a constant representing the parameter's position in the backing ARRAY. An
+appropriate constructor is generated and installed, as well as constants that
+can be used within the class to index into the C<$self> object.
+
+That's it; no accessors, no defaults, no type-checks, no required attributes,
+nothing fancy (L<Class::Method::Modifiers> may be convenient there).
+
+The generated constructor takes parameters as either a list of pairs or a
+single HASH. Parameters not specified at construction time are C<undef>.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut
 
 # vim: ts=2 sw=2 et sts=2 ft=perl
