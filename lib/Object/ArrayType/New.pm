@@ -56,8 +56,9 @@ sub _validate_and_install {
 
   my @install;
   PARAM: while (my ($initarg, $def) = splice @items, 0, 2) {
+    confess "Don't know what to do with boolean false parameter"
+      unless $initarg;
     my $store = $def ? $def : uc($initarg);
-    # FIXME sanity check $store
     push @install, +{
       name     => $initarg,
       constant => $store,
@@ -72,14 +73,12 @@ sub _validate_and_install {
 
 sub _generate_storage {
   my ($class, $target, $items) = @_;
-  my $idx = 0;
-  my $code = '';
+  my $code = "  my \$self = bless [\n";
   for my $item (@$items) {
     my $attr = $item->{name};
-    $code .= qq[  \$self->[$idx] = defined \$args->{$attr} ?\n];
-    $code .= qq[    \$args->{$attr} : undef;\n];
-    $idx++
+    $code .= qq[   (defined \$args{$attr} ? \$args{$attr} : undef),\n];
   }
+  $code .= '  ], $class;';
 
   $code
 }
@@ -89,24 +88,21 @@ sub _install_constructor {
 
   my $code = <<'_EOC';
 sub new {
-  my $class = shift; my $args;
+  my $class = shift; my %args;
   if (@_ == 1) {
     Carp::confess "Expected single param to be a HASH but got $_[0]"
       unless ref $_[0] and Scalar::Util::reftype $_[0] eq 'HASH';
-    $args = +{ %{ $_[0] } }
+    %args = %{ $_[0] }
   } elsif (@_ % 2) {
     Carp::confess "Expected either a HASH or a list of key/value pairs"
   } else {
-    $args = +{ @_ }
+    %args = @_
   }
-
-  my $self = []; bless $self, $class;
 
 _EOC
   
   $code .= $class->_generate_storage($target => $items);
-  $code .= "  \$self\n}\n";
-
+  $code .= "\n  \$self\n}\n";
   $class->_inject_code($target => $code)  
 }
 
