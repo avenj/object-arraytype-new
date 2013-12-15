@@ -1,0 +1,63 @@
+# NAME
+
+Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
+
+# SYNOPSIS
+
+    package MyObject;
+    use strict; use warnings;
+    use Object::ArrayType::New
+      [ foo => 'FOO', bar => 'BAR' ];
+    sub foo { shift->[FOO] }
+    sub bar { shift->[BAR] ||= [] }
+
+    my $obj = MyObject->new(foo => 'baz');
+    my $foo = $obj->foo; # baz
+    my $bar = $obj->bar; # []
+
+# DESCRIPTION
+
+A common thing I find myself doing looks something like:
+
+    package MySimpleObject;
+    use strict; use warnings;
+
+    sub TAG () { 0 }
+    sub BUF () { 1 }
+
+    sub new {
+      my $class = shift;
+      my %params = @_ > 1 ? @_ : %{ $_[0] };
+      bless [
+        $params{tag},             # TAG
+        ($params{buffer} || [])   # BUF
+      ], $class
+    }
+    sub tag     { shift->[TAG] }
+    sub buffer  { shift->[BUF] }
+
+... when I'd rather be doing something more like the ["SYNOPSIS"](#SYNOPSIS).
+
+This tiny module takes a list of pairs mapping a `new()` parameter to the name of
+a constant representing the parameter's position in the backing ARRAY. If the
+constant's name is boolean false, the uppercased parameter name is taken as
+the name of the constant.
+
+An appropriate constructor is generated and installed, as well as constants
+that can be used within the class to index into the `$self` object.
+
+The generated constructor takes parameters as either a list of pairs or a
+single HASH. Parameters not specified at construction time are `undef`.
+
+That's it; no accessors, no defaults, no type-checks, no required attributes,
+nothing fancy ([Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers) may be convenient there).
+
+if `$ENV{OBJECT_ARRAYTYPE_DEBUG}` is true, generated code is printed to
+STDERR before being evaluated.
+
+Constants aren't currently sanity-checked ahead of time; attempting to use
+invalid identifiers will result in 'Illegal declaration ...' failures.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

@@ -117,6 +117,7 @@ Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
   sub foo { shift->[FOO] }
   sub bar { shift->[BAR] ||= [] }
 
+  package main;
   my $obj = MyObject->new(foo => 'baz');
   my $foo = $obj->foo; # baz
   my $bar = $obj->bar; # []
@@ -156,7 +157,19 @@ The generated constructor takes parameters as either a list of pairs or a
 single HASH. Parameters not specified at construction time are C<undef>.
 
 That's it; no accessors, no defaults, no type-checks, no required attributes,
-nothing fancy (L<Class::Method::Modifiers> may be convenient there).
+nothing fancy -- L<Class::Method::Modifiers> may be convenient there. The
+above example could be written something like:
+
+  use Object::ArrayType::New [ tag => '', buffer => 'BUF' ];
+  sub tag    { shift->[TAG] }
+  sub buffer { shift->[BUF] }
+  use Class::Method::Modifers;
+  around new => sub {
+    my ($orig, $class) = splice @_, 0, 2;
+    my $self = $class->$orig(@_);
+    $self->[BUF] = [] unless defined $self->[BUF];
+    $self
+  };
 
 if C<< $ENV{OBJECT_ARRAYTYPE_DEBUG} >> is true, generated code is printed to
 STDERR before being evaluated.
