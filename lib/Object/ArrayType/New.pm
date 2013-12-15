@@ -3,7 +3,7 @@ use strict; use warnings;
 
 use Carp;
 use B ();
-use Scalar::Util 'blessed', 'reftype';
+use Scalar::Util 'reftype';
 
 sub import {
   my ($class, $params) = @_;
@@ -21,20 +21,16 @@ sub _inject_code {
   my ($class, $target, $code) = @_;
   confess "Expected a target package and string to inject"
     unless defined $target and defined $code;
-
   my $run = "package $target; $code; 1;";
   warn "(eval ->) $run\n" if $ENV{OBJECT_ARRAYTYPE_DEBUG};
   local $@; eval $run; die $@ if $@;
-
   1
 }
 
 sub _inject_constant {
   my ($class, $target, $name, $val) = @_;
-
   my $code = ref $val ? "sub $name () { \$val }"
     : "sub $name () { ${\ B::perlstring($val) } }";
-
   $class->_inject_code($target => $code)
 }
 
@@ -51,7 +47,6 @@ sub _install_constants {
 
 sub _validate_and_install {
   my ($class, $target, $params) = @_;
-
   my @items = reftype $params eq 'HASH' ? %$params : @$params;
 
   my @install;
@@ -67,19 +62,16 @@ sub _validate_and_install {
 
   $class->_install_constants($target => \@install);
   $class->_install_constructor($target => \@install);
-
-  1
 }
 
 sub _generate_storage {
-  my ($class, $target, $items) = @_;
+  my (undef, $target, $items) = @_;
   my $code = "  my \$self = bless [\n";
   for my $item (@$items) {
     my $attr = $item->{name};
     $code .= qq[   (defined \$args{$attr} ? \$args{$attr} : undef),\n];
   }
   $code .= '  ], $class;';
-
   $code
 }
 
@@ -123,11 +115,11 @@ Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
   use Object::ArrayType::New
     [ foo => 'FOO', bar => 'BAR' ];
   sub foo { shift->[FOO] }
-  sub bar { shift->[BAR] }
+  sub bar { shift->[BAR] ||= [] }
 
   my $obj = MyObject->new(foo => 'baz');
   my $foo = $obj->foo; # baz
-  my $bar = $obj->bar; # undef
+  my $bar = $obj->bar; # []
 
 =head1 DESCRIPTION
 
@@ -160,11 +152,17 @@ the name of the constant.
 An appropriate constructor is generated and installed, as well as constants
 that can be used within the class to index into the C<$self> object.
 
+The generated constructor takes parameters as either a list of pairs or a
+single HASH. Parameters not specified at construction time are C<undef>.
+
 That's it; no accessors, no defaults, no type-checks, no required attributes,
 nothing fancy (L<Class::Method::Modifiers> may be convenient there).
 
-The generated constructor takes parameters as either a list of pairs or a
-single HASH. Parameters not specified at construction time are C<undef>.
+if C<< $ENV{OBJECT_ARRAYTYPE_DEBUG} >> is true, generated code is printed to
+STDERR before being evaluated.
+
+Constants aren't currently sanity-checked ahead of time; attempting to use
+invalid identifiers will result in 'Illegal declaration ...' failures.
 
 =head1 AUTHOR
 
