@@ -65,7 +65,7 @@ sub _validate_and_install {
 }
 
 sub _generate_storage {
-  my (undef, $target, $items) = @_;
+  my (undef, undef, $items) = @_;
   my $code = "  my \$self = bless [\n";
   for my $item (@$items) {
     my $attr = $item->{name};
