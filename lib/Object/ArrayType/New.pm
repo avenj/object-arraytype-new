@@ -137,6 +137,7 @@ A common thing I find myself doing looks something like:
 
   sub TAG () { 0 }
   sub BUF () { 1 }
+  # ...
 
   sub new {
     my $class = shift;
@@ -144,10 +145,12 @@ A common thing I find myself doing looks something like:
     bless [
       $params{tag},             # TAG
       ($params{buffer} || [])   # BUF
+      # ...
     ], $class
   }
   sub tag     { shift->[TAG] }
   sub buffer  { shift->[BUF] }
+  # ...
 
 ... when I'd rather be doing something more like the L</SYNOPSIS>.
 
