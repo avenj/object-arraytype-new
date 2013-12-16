@@ -51,6 +51,7 @@ sub _validate_and_install {
 
   my @install;
   PARAM: while (my ($initarg, $def) = splice @items, 0, 2) {
+    # FIXME allow empty-string init args, always set undef in _generate_storage
     confess "Don't know what to do with boolean false parameter"
       unless $initarg;
     my $store = $def ? $def : uc($initarg);
@@ -98,6 +99,10 @@ _EOC
   $class->_inject_code($target => $code)  
 }
 
+print
+  q[<SpiceMan> also every time you @result = `curl blahblah`],
+  qq[ LeoNerd uses passive voice\n]
+unless caller;
 1;
 
 =pod
