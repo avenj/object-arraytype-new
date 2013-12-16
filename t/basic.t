@@ -3,9 +3,10 @@ use strict; use warnings;
 
 { package ArrayType::Basic;
   use strict; use warnings;
-  use Object::ArrayType::New [ foo => 'FOO', bar => '' ];
+  use Object::ArrayType::New [ foo => 'FOO', bar => '', baz => '' ];
   sub foo { shift->[FOO] }
   sub bar { shift->[BAR] }
+  sub baz { shift->[BAZ] }
 }
 
 my $obj = ArrayType::Basic->new(
@@ -15,6 +16,7 @@ my $obj = ArrayType::Basic->new(
 
 ok $obj->foo == 1, 'foo ok';
 ok $obj->bar == 2, 'bar ok';
+ok !defined $obj->baz, 'baz ok';
 
 $obj = ArrayType::Basic->new(
   +{ foo => 1 }
