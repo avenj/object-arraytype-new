@@ -26,6 +26,7 @@ BEGIN {
 }
 
 my $obj = WithDefaults->new;
+isa_ok $obj, 'WithDefaults';
 ok !defined $obj->foo,    'foo not defined ok';
 ok $obj->bar eq 'weeble', 'bar set default ok';
 

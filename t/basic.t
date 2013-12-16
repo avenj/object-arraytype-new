@@ -14,15 +14,17 @@ my $obj = ArrayType::Basic->new(
   bar => 2
 );
 
+isa_ok $obj, 'ArrayType::Basic';
 ok $obj->foo == 1, 'foo ok';
 ok $obj->bar == 2, 'bar ok';
 ok !defined $obj->baz, 'baz ok';
 
-$obj = ArrayType::Basic->new(
+$obj = $obj->new(
   +{ foo => 1 }
 );
 
-ok $obj->foo == 1, 'hash passed to new ok';
+isa_ok $obj, 'ArrayType::Basic';
+ok $obj->foo == 1, 'hash passed to $obj->new ok';
 ok !defined $obj->bar, 'bar undef ok';
 
 
@@ -38,6 +40,7 @@ $obj = ArrayType::HashOpts->new(
   bar => 456
 );
 
+isa_ok $obj, 'ArrayType::HashOpts';
 ok $obj->foo == 123, 'hash-type params foo ok';
 ok $obj->bar == 456, 'hash-type params bar ok';
 
@@ -55,6 +58,7 @@ $obj = ArrayType::NullArgs->new(
   bar => 123,
 );
 
+isa_ok $obj, 'ArrayType::NullArgs';
 ok $obj->_private_foo == 1, 'params with null args foo ok';
 ok $obj->_private_baz == 2, 'params with null args baz ok';
 ok $obj->bar == 123, 'params with null args bar ok';

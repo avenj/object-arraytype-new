@@ -3,7 +3,7 @@ use strict; use warnings;
 
 use Carp;
 use B ();
-use Scalar::Util 'reftype';
+use Scalar::Util 'blessed', 'reftype';
 
 sub import {
   my ($class, $params) = @_;
@@ -83,6 +83,9 @@ sub _install_constructor {
   my $code = <<'_EOC';
 sub new {
   my $class = shift; my %args;
+  if (my $blessed = Scalar::Util::blessed($class)) {
+    $class = $blessed
+  }
   if (@_ == 1) {
     Carp::confess "Expected single param to be a HASH but got $_[0]"
       unless ref $_[0] and Scalar::Util::reftype $_[0] eq 'HASH';
