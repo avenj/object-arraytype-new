@@ -162,8 +162,8 @@ The generated constructor takes parameters as either a list of pairs or a
 single HASH. Parameters not specified at construction time are C<undef>.
 
 That's it; no accessors, no defaults, no type-checks, no required attributes,
-nothing fancy -- L<Class::Method::Modifiers> may be convenient there. The
-above example could be written something like:
+nothing fancy. L<Class::Method::Modifiers> may be convenient there; the above
+example could be written something like:
 
   use Object::ArrayType::New [ tag => '', buffer => 'BUF' ];
   sub tag    { shift->[TAG] }
