@@ -73,7 +73,7 @@ sub _generate_storage {
           qq[   (defined \$args{$attr} ? \$args{$attr} : undef),\n]
         : qq[   undef,\n]
   }
-  $code .= '  ], $class;';
+  $code .= '  ], (Scalar::Util::blessed($class) || $class);';
   $code
 }
 
@@ -83,9 +83,6 @@ sub _install_constructor {
   my $code = <<'_EOC';
 sub new {
   my $class = shift; my %args;
-  if (my $blessed = Scalar::Util::blessed($class)) {
-    $class = $blessed
-  }
   if (@_ == 1) {
     Carp::confess "Expected single param to be a HASH but got $_[0]"
       unless ref $_[0] and Scalar::Util::reftype $_[0] eq 'HASH';
