@@ -155,7 +155,11 @@ This tiny module takes a list of pairs mapping a C<new()> parameter to the name 
 a constant representing the parameter's position in the backing ARRAY.
 
 If the constant's name is boolean false, the uppercased parameter name is
-taken as the name of the constant.
+taken as the name of the constant:
+
+  use Object::ArrayType::New
+    [ foo => '', bar => '' ];
+  # same as foo => 'FOO', bar => 'BAR'
 
 If the parameter's name is boolean false, the constant is installed and the
 appropriate position in the backing ARRAY is set to C<undef> at construction
