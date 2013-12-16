@@ -120,8 +120,8 @@ Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
   use strict; use warnings;
   use Object::ArrayType::New
     [ foo => 'FOO', bar => 'BAR' ];
-  sub foo { shift->[FOO] }
-  sub bar { shift->[BAR] ||= [] }
+  sub foo     { shift->[FOO] }
+  sub bar     { shift->[BAR] ||= [] }
 
   package main;
   my $obj = MyObject->new(foo => 'baz');
@@ -154,19 +154,21 @@ A common thing I find myself doing looks something like:
 
 ... when I'd rather be doing something more like the L</SYNOPSIS>.
 
-This tiny module takes a list of pairs mapping a C<new()> parameter to the name of
-a constant representing the parameter's position in the backing ARRAY.
+This tiny module takes an ARRAY of pairs mapping a C<new()> parameter name to the
+name of a constant. The constant represents the item's position in the
+object's backing ARRAY.
 
 If the constant's name is boolean false, the uppercased parameter name is
-taken as the name of the constant:
+used as the name of the constant:
 
   use Object::ArrayType::New
     [ foo => '', bar => '' ];
   # same as foo => 'FOO', bar => 'BAR'
 
-If the parameter's name is boolean false, the constant is installed and the
-appropriate position in the backing ARRAY is set to C<undef> at construction
-time; this can be useful for private attributes:
+If the parameter's name is boolean false, there is no construction-time
+parameter. The constant is installed and the appropriate position in the
+backing ARRAY is set to C<undef> at construction time; this can be useful for
+private attributes:
 
   use Object::ArrayType::New
     [ foo => 'FOO', '' => 'BAR' ];
