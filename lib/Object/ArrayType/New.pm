@@ -51,10 +51,9 @@ sub _validate_and_install {
 
   my @install;
   PARAM: while (my ($initarg, $def) = splice @items, 0, 2) {
-    # FIXME allow empty-string init args, always set undef in _generate_storage
-    confess "Don't know what to do with boolean false parameter"
-      unless $initarg;
+    $initarg = '' unless defined $initarg;
     my $store = $def ? $def : uc($initarg);
+    confess "No init arg and no constant specified!" unless $store;
     push @install, +{
       name     => $initarg,
       constant => $store,
@@ -70,7 +69,9 @@ sub _generate_storage {
   my $code = "  my \$self = bless [\n";
   for my $item (@$items) {
     my $attr = $item->{name};
-    $code .= qq[   (defined \$args{$attr} ? \$args{$attr} : undef),\n];
+    $code .= $attr ? 
+          qq[   (defined \$args{$attr} ? \$args{$attr} : undef),\n]
+        : qq[   undef,\n]
   }
   $code .= '  ], $class;';
   $code
@@ -151,9 +152,19 @@ A common thing I find myself doing looks something like:
 ... when I'd rather be doing something more like the L</SYNOPSIS>.
 
 This tiny module takes a list of pairs mapping a C<new()> parameter to the name of
-a constant representing the parameter's position in the backing ARRAY. If the
-constant's name is boolean false, the uppercased parameter name is taken as
-the name of the constant.
+a constant representing the parameter's position in the backing ARRAY.
+
+If the constant's name is boolean false, the uppercased parameter name is
+taken as the name of the constant.
+
+If the parameter's name is boolean false, the constant is installed and the
+appropriate position in the backing ARRAY is set to C<undef> at construction
+time; this can be useful for private attributes:
+
+  use Object::ArrayType::New
+    [ foo => 'FOO', '' => 'BAR' ];
+  sub foo  { shift->[FOO] ||= 'foo' }
+  sub _bar { shift->[BAR] ||= [] }
 
 An appropriate constructor is generated and installed, as well as constants
 that can be used within the class to index into the C<$self> object.

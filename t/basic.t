@@ -25,6 +25,7 @@ $obj = ArrayType::Basic->new(
 ok $obj->foo == 1, 'hash passed to new ok';
 ok !defined $obj->bar, 'bar undef ok';
 
+
 { package ArrayType::HashOpts;
   use strict; use warnings;
   use Object::ArrayType::New +{ foo => '_foo', bar => '_bar' };
@@ -39,5 +40,23 @@ $obj = ArrayType::HashOpts->new(
 
 ok $obj->foo == 123, 'hash-type params foo ok';
 ok $obj->bar == 456, 'hash-type params bar ok';
+
+
+{ package ArrayType::NullArgs;
+  use strict; use warnings;
+  use Object::ArrayType::New
+    [ '' => '_FOO', bar => '', '' => '_BAZ' ];
+  sub _private_foo { shift->[_FOO] ||= 1 }
+  sub _private_baz { shift->[_BAZ] ||= 2 }
+  sub bar { shift->[BAR] }
+}
+
+$obj = ArrayType::NullArgs->new(
+  bar => 123,
+);
+
+ok $obj->_private_foo == 1, 'params with null args foo ok';
+ok $obj->_private_baz == 2, 'params with null args baz ok';
+ok $obj->bar == 123, 'params with null args bar ok';
 
 done_testing
