@@ -25,6 +25,7 @@ A common thing I find myself doing looks something like:
 
     sub TAG () { 0 }
     sub BUF () { 1 }
+    # ...
 
     sub new {
       my $class = shift;
@@ -32,17 +33,33 @@ A common thing I find myself doing looks something like:
       bless [
         $params{tag},             # TAG
         ($params{buffer} || [])   # BUF
+        # ...
       ], $class
     }
     sub tag     { shift->[TAG] }
     sub buffer  { shift->[BUF] }
+    # ...
 
 ... when I'd rather be doing something more like the ["SYNOPSIS"](#SYNOPSIS).
 
 This tiny module takes a list of pairs mapping a `new()` parameter to the name of
-a constant representing the parameter's position in the backing ARRAY. If the
-constant's name is boolean false, the uppercased parameter name is taken as
-the name of the constant.
+a constant representing the parameter's position in the backing ARRAY.
+
+If the constant's name is boolean false, the uppercased parameter name is
+taken as the name of the constant:
+
+    use Object::ArrayType::New
+      [ foo => '', bar => '' ];
+    # same as foo => 'FOO', bar => 'BAR'
+
+If the parameter's name is boolean false, the constant is installed and the
+appropriate position in the backing ARRAY is set to `undef` at construction
+time; this can be useful for private attributes:
+
+    use Object::ArrayType::New
+      [ foo => 'FOO', '' => 'BAR' ];
+    sub foo  { shift->[FOO] ||= 'foo' }
+    sub _bar { shift->[BAR] ||= [] }
 
 An appropriate constructor is generated and installed, as well as constants
 that can be used within the class to index into the `$self` object.

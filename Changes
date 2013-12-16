@@ -1,5 +1,11 @@
 Revision history for Perl module Object-ArrayType-New
 
+0.002001 2013-12-15
+
+  - Support attribs without a constructor parameter
+
+  - Support $obj->new()
+
 0.001001 2013-12-15
 
    - Initial release
