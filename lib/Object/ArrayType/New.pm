@@ -130,6 +130,12 @@ Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
 
 =head1 DESCRIPTION
 
+ARRAY-backed objects are light and fast, but obviously slightly more
+complicated to cope with than just stuffing key/value pairs into a HASH.
+The easiest way to keep track of where things live is to set up some named
+constants to index into the ARRAY -- you can access your indexes by name,
+and gain compile-time typo checking as an added bonus.
+
 A common thing I find myself doing looks something like:
 
   package MySimpleObject;
@@ -183,7 +189,7 @@ single HASH. Parameters not specified at construction time are C<undef>.
 
 That's it; no accessors, no defaults, no type-checks, no required attributes,
 nothing fancy. L<Class::Method::Modifiers> may be convenient there; the above
-example could be written something like:
+raw Perl example could be written something like:
 
   use Object::ArrayType::New [ tag => '', buffer => 'BUF' ];
   sub tag    { shift->[TAG] }
@@ -200,7 +206,7 @@ if C<< $ENV{OBJECT_ARRAYTYPE_DEBUG} >> is true, generated code is printed to
 STDERR before being evaluated.
 
 Constants aren't currently sanity-checked ahead of time; attempting to use
-invalid identifiers will result in 'Illegal declaration ...' failures.
+invalid identifiers will result in vague 'Illegal declaration ...' failures.
 
 =head1 AUTHOR
 
