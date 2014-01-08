@@ -23,7 +23,8 @@ sub _inject_code {
     unless defined $target and defined $code;
   my $run = "package $target; $code; 1;";
   warn "(eval ->) $run\n" if $ENV{OBJECT_ARRAYTYPE_DEBUG};
-  local $@; eval $run; die $@ if $@;
+  local $@; 
+  eval $run and not $@ or confess "eval: $@";
   1
 }
 
@@ -52,7 +53,7 @@ sub _validate_and_install {
   my @install;
   PARAM: while (my ($initarg, $def) = splice @items, 0, 2) {
     $initarg = '' unless defined $initarg;
-    my $store = $def ? $def : uc($initarg);
+    my $store = $def ? $def : uc $initarg;
     confess "No init arg and no constant specified!" unless $store;
     push @install, +{
       name     => $initarg,
