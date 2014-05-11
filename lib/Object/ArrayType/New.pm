@@ -40,8 +40,7 @@ sub _install_constants {
   my $idx = 0;
   for my $item (@$items) {
     my $constant = $item->{constant};
-    $class->_inject_constant($target => $constant => $idx);
-    $idx++
+    $class->_inject_constant($target => $constant => $idx++);
   }
   1
 }
