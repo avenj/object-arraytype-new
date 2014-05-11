@@ -63,4 +63,12 @@ ok $obj->_private_foo == 1, 'params with null args foo ok';
 ok $obj->_private_baz == 2, 'params with null args baz ok';
 ok $obj->bar == 123, 'params with null args bar ok';
 
+{ package ArrayType::NoParams;
+  use strict; use warnings;
+  use Object::ArrayType::New;
+}
+
+$obj = ArrayType::NoParams->new;
+isa_ok $obj, 'ArrayType::NoParams';
+
 done_testing
