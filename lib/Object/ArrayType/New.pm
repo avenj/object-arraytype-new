@@ -160,18 +160,18 @@ A common thing I find myself doing looks something like:
 
 ... when I'd rather be doing something more like the L</SYNOPSIS>.
 
-This tiny module takes an ARRAY of pairs mapping a C<new()> parameter name to the
-name of a constant. The constant represents the item's position in the
-object's backing ARRAY.
+This tiny module takes, as arguments to C<import>, an ARRAY of pairs mapping a
+C<new()> parameter name to the name of a constant. The constant represents the
+item's position in the object's backing ARRAY.
 
-If the constant's name is boolean false, the uppercased parameter name is
+If the B<constant>'s name is boolean false, the uppercased parameter name is
 used as the name of the constant:
 
   use Object::ArrayType::New
     [ foo => '', bar => '' ];
   # same as foo => 'FOO', bar => 'BAR'
 
-If the parameter's name is boolean false, there is no construction-time
+If the B<parameter>'s name is boolean false, there is no construction-time
 parameter. The constant is installed and the appropriate position in the
 backing ARRAY is set to C<undef> at construction time; this can be useful for
 private attributes:
