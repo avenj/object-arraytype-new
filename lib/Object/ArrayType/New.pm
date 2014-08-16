@@ -112,7 +112,7 @@ unless caller;
 
 =head1 NAME
 
-Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
+Object::ArrayType::New - Inject constants and constructor for ARRAY-type objects
 
 =head1 SYNOPSIS
 
