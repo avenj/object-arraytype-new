@@ -1,6 +1,6 @@
 # NAME
 
-Object::ArrayType::New - Inject constants & constructors for ARRAY-type objects
+Object::ArrayType::New - Inject constants and constructor for ARRAY-type objects
 
 # SYNOPSIS
 
@@ -46,20 +46,20 @@ A common thing I find myself doing looks something like:
     sub buffer  { shift->[BUF] }
     # ...
 
-... when I'd rather be doing something more like the ["SYNOPSIS"](#SYNOPSIS).
+... when I'd rather be doing something more like the ["SYNOPSIS"](#synopsis).
 
-This tiny module takes an ARRAY of pairs mapping a `new()` parameter name to the
-name of a constant. The constant represents the item's position in the
-object's backing ARRAY.
+This tiny module takes, as arguments to `import`, an ARRAY of pairs mapping a
+`new()` parameter name to the name of a constant. The constant represents the
+item's position in the object's backing ARRAY.
 
-If the constant's name is boolean false, the uppercased parameter name is
+If the **constant**'s name is boolean false, the uppercased parameter name is
 used as the name of the constant:
 
     use Object::ArrayType::New
       [ foo => '', bar => '' ];
     # same as foo => 'FOO', bar => 'BAR'
 
-If the parameter's name is boolean false, there is no construction-time
+If the **parameter**'s name is boolean false, there is no construction-time
 parameter. The constant is installed and the appropriate position in the
 backing ARRAY is set to `undef` at construction time; this can be useful for
 private attributes:
@@ -76,7 +76,7 @@ The generated constructor takes parameters as either a list of pairs or a
 single HASH. Parameters not specified at construction time are `undef`.
 
 That's it; no accessors, no defaults, no type-checks, no required attributes,
-nothing fancy. [Class::Method::Modifiers](http://search.cpan.org/perldoc?Class::Method::Modifiers) may be convenient there; the above
+nothing fancy. [Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers) may be convenient there; the above
 raw Perl example could be written something like:
 
     use Object::ArrayType::New [ tag => '', buffer => 'BUF' ];
